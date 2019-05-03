@@ -47,6 +47,7 @@ public class Tablero implements Serializable {
     void añadirBarcoJ2( int x, int y){
         tablero[x][y] = 'b';
     }
+    //
 
     public void estadoPartida(boolean estado) {
        this.estado = estado;
