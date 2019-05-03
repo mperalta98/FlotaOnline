@@ -103,7 +103,7 @@ public class UDPClient {
         //Demanem la ip del servidor i nom del jugador
         System.out.println("IP del servidor?");
         Scanner sc = new Scanner(System.in);
-        ipSrv = "192.168.22.104"; //sc.next();
+        ipSrv = sc.next();
         System.out.println("Nom jugador:");
         jugador = sc.next();
 
