@@ -4,7 +4,11 @@ import java.io.Serializable;
 
 public class Jugada implements Serializable {
     String Nom;
-    int x;
+    int x, y, numJ;
+
+    public void setNumJ(int numJ) {
+        this.numJ = numJ;
+    }
 
     public String getNom() {
         return Nom;
@@ -29,8 +33,4 @@ public class Jugada implements Serializable {
     public void setY(int y) {
         this.y = y;
     }
-
-    int y;
-
-
 }

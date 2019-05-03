@@ -2,16 +2,15 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 public class UDPClient {
 
         private int portDesti;
-        private int result;
         private String Nom, ipSrv;
-        private int intents;
         private InetAddress adrecaDesti;
+        boolean estadoPartida = true;
+        int numJ;
 
         Tablero tablero;
         Jugada jugada = new Jugada();
@@ -19,8 +18,6 @@ public class UDPClient {
 
     public UDPClient(String ip, int port) {
             this.portDesti = port;
-            result = -1;
-            intents = 0;
             ipSrv = ip;
 
             try {
@@ -34,25 +31,24 @@ public class UDPClient {
             Nom=n;
         }
 
-        public int getIntents () {
-            return intents;
-        }
-
         public void runClient() throws IOException {
             byte [] receivedData = new byte[1024];
 
             //Missatge de benvinguda
-            System.out.println("Hola " + Nom + "! Comencem!\n Indica la posición X y la Y: ");
+            System.out.println("Num jugador (1 o 2):");
+            numJ = scanner.nextInt();
 
+
+
+
+            System.out.println("Hola " + Nom + "! Comencem! ");
             //Bucle de joc
-            while(true) {
-
+            do {
+                System.out.println("Indica la posición X y la Y: ");
                 int posX = scanner.nextInt();
-//                scanner.nextLine();
-
                 int posY = scanner.nextInt();
-//                scanner.nextLine();
 
+                jugada.setNumJ(numJ);
                 jugada.setX(posX);
                 jugada.setY(posY);
 
@@ -80,47 +76,27 @@ public class UDPClient {
                 //espera de les dades
                 socket.setSoTimeout(5000);
 
-
                 ByteArrayInputStream in = new ByteArrayInputStream(packet.getData());
                 try {
-                    socket.receive(packet);
+                     socket.receive(packet);
 
+                     ObjectInputStream ois = new ObjectInputStream(in);
+                     tablero = (Tablero) ois.readObject();
+                     if(tablero.responseCode == 3){
+                         System.out.println("No es tu turno");
+                     } else {
+                         estadoPartida = tablero.estadoJuego();
+                         tablero.imprimeTablero();
+                     }
 
-
-                    ObjectInputStream ois = new ObjectInputStream(in);
-                    tablero = (Tablero) ois.readObject();
-                    tablero.imprimeTablero();
-
-                    //processament de les dades rebudes i obtenció de la resposta
-//                    result = getDataToRequest(packet.getData(), packet.getLength());
-                }catch(SocketTimeoutException e) {
-                    System.out.println("El servidor no respòn: " + e.getMessage());
-                    result=-2;
+                //processament de les dades rebudes i obtenció de la resposta
+                } catch (SocketTimeoutException e) {
+                     System.out.println("El servidor no respòn: " + e.getMessage());
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 socket.close();
-            }
-
-
-        }
-
-//        private int getDataToRequest(byte[] data, int length) {
-//            int nombre = ByteBuffer.wrap(data).getInt();
-//            if(nombre==0) System.out.println("Correcte");
-//            else if (nombre==1) System.out.println("Més petit");
-//            else System.out.println("Més gran");
-//            intents++;
-
-//            return nombre;
-//        }
-
-        public int getResult() {
-            return result;
-        }
-
-        public void setResult(int result) {
-            this.result = result;
+            } while (tablero.estadoJuego());
         }
 
         public static void main(String[] args) {
@@ -128,10 +104,10 @@ public class UDPClient {
 
             //Demanem la ip del servidor i nom del jugador
             System.out.println("IP del servidor?");
-            Scanner sip = new Scanner(System.in);
-            ipSrv = "192.168.22.104"; //sip.next();
+            Scanner sc = new Scanner(System.in);
+            ipSrv = "192.168.22.104"; //sc.next();
             System.out.println("Nom jugador:");
-            jugador = "yo"; //sip.next();
+            jugador = sc.next();
 
             UDPClient client = new UDPClient(ipSrv, 5556);
 
@@ -141,13 +117,6 @@ public class UDPClient {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            if(client.getResult() == 0) {
-                System.out.println("Fi, ho has aconseguit amb "+ client.getIntents() +" intents");
-            } else {
-                System.out.println("Has perdut");
-            }
-
+            System.out.println("Victoria");
         }
-
     }

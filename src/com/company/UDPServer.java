@@ -1,23 +1,15 @@
 package com.company;
-//TODO: Enviar la información de los tableros al servidor UDP.
-//TODO:Los clientes tienen que enviar las posiciones, el servidor recibirlas y devolver el tablero con los nuevos valores.
 import java.io.*;
 import java.net.*;
-
-import java.io.*;
-import java.net.*;
-import java.nio.ByteBuffer;
 
 public class UDPServer {
 
-
     DatagramSocket socket;
-    int port, fi;
-    Tablero tablero;
+    int port;
+    Tablero tablero, tablero2;
     Barco barco;
-    Jugada jugada;
-    boolean acabat;
-    int numJugadores;
+
+    int turno = -1;
 
     public UDPServer(int port) throws IOException {
         try {
@@ -28,8 +20,7 @@ public class UDPServer {
         this.port = port;
         barco = new Barco();
         tablero = new Tablero(5, '-', 'O');
-        acabat = false;
-        fi = -1;
+        tablero2 = new Tablero(5, '-', 'O');
     }
 
     public void runServer() throws IOException{
@@ -38,11 +29,11 @@ public class UDPServer {
         InetAddress clientIP;
         int clientPort;
 
-        barco.imprimeBarco(tablero);
+        barco.imprimeBarco(tablero, tablero2);
         System.out.println("Barcos añadidos");
 
         //el servidor atén el port indefinidament
-        while(!acabat){
+        while(barco.derrota){
 
             //creació del paquet per rebre les dades
             DatagramPacket packet = new DatagramPacket(receivingData, 1024);
@@ -70,11 +61,29 @@ public class UDPServer {
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             jugada = (Jugada) ois.readObject();
-            System.out.println("jugada:" + jugada.Nom + " " + jugada.getX());
-            System.out.println("jugada:" + jugada.Nom + " " + jugada.getY());
-            //Si no existeix el jugador a la llista és un jugador nou
-            //per tant l'afegim i inicialitzem les tirades
-            barco.disparar(tablero,jugada.x,jugada.y);
+
+            if(turno == -1 || turno == jugada.numJ) {
+                System.out.println("jugada:" + jugada.Nom + " " + jugada.getX());
+                System.out.println("jugada:" + jugada.Nom + " " + jugada.getY());
+                //Si no existeix el jugador a la llista és un jugador nou
+                //per tant l'afegim i inicialitzem les tirades
+                if (jugada.numJ == 1) {
+                    barco.disparar(tablero2, jugada.x, jugada.y);
+                    turno = 2;
+                    tablero2.responseCode = 1;
+                } else {
+                    barco.disparar(tablero, jugada.x, jugada.y);
+                    turno = 1;
+                    tablero.responseCode = 1;
+                }
+            } else {
+                if(jugada.numJ == 1) {
+                    tablero2.responseCode = 3;
+                } else {
+                    tablero.responseCode = 3;
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -86,7 +95,12 @@ public class UDPServer {
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(os);
-            oos.writeObject(tablero);
+            if(jugada.numJ == 1) {
+                oos.writeObject(tablero2);
+            } else {
+                oos.writeObject(tablero);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
