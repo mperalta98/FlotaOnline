@@ -6,12 +6,12 @@ public class UDPServer {
 
     DatagramSocket socket;
     int port;
+    int turno = -1;
+
     Tablero tablero, tablero2;
     Barco barco;
 
-    int turno = -1;
-
-    public UDPServer(int port) throws IOException {
+    public UDPServer(int port) {
         try {
             socket = new DatagramSocket(port);
         } catch (SocketException e) {
@@ -58,29 +58,26 @@ public class UDPServer {
     private byte[] processData(byte[] data, int length) {
         Jugada jugada = null;
         ByteArrayInputStream in = new ByteArrayInputStream(data);
+
         try {
             ObjectInputStream ois = new ObjectInputStream(in);
             jugada = (Jugada) ois.readObject();
 
             if(turno == -1 || turno == jugada.numJ) {
-                System.out.println("jugada:" + jugada.Nom + " " + jugada.getX());
-                System.out.println("jugada:" + jugada.Nom + " " + jugada.getY());
-                //Si no existeix el jugador a la llista és un jugador nou
-                //per tant l'afegim i inicialitzem les tirades
                 if (jugada.numJ == 1) {
                     barco.disparar(tablero2, jugada.x, jugada.y);
                     turno = 2;
-                    tablero2.responseCode = 1;
+                    tablero2.turnoValido = true;
                 } else {
                     barco.disparar(tablero, jugada.x, jugada.y);
                     turno = 1;
-                    tablero.responseCode = 1;
+                    tablero.turnoValido = true;
                 }
             } else {
                 if(jugada.numJ == 1) {
-                    tablero2.responseCode = 3;
+                    tablero2.turnoValido = false;
                 } else {
-                    tablero.responseCode = 3;
+                    tablero.turnoValido = false;
                 }
             }
 
@@ -108,7 +105,7 @@ public class UDPServer {
         return resposta;
     }
 
-    public static void main(String[] args) throws SocketException, IOException {
+    public static void main(String[] args) {
         UDPServer server = new UDPServer(5556);
 
         try {

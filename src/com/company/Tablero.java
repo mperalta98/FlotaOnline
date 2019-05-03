@@ -8,7 +8,7 @@ public class Tablero implements Serializable {
     char caracterDestapado;
     char tablero[][];
     boolean estado = true;
-    int responseCode;
+    boolean turnoValido;
 
     Tablero(int dimension, char caracterSinDestapar, char caracterDestapado) {
         this.dimension = dimension;

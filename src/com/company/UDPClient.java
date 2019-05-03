@@ -38,9 +38,6 @@ public class UDPClient {
             System.out.println("Num jugador (1 o 2):");
             numJ = scanner.nextInt();
 
-
-
-
             System.out.println("Hola " + Nom + "! Comencem! ");
             //Bucle de joc
             do {
@@ -69,6 +66,7 @@ public class UDPClient {
                 DatagramSocket socket = new DatagramSocket();
                 //Enviament del missatge
                 System.out.println("ENVIANDO....");
+                System.out.println();
                 socket.send(packet);
 
                 //creació del paquet per rebre les dades
@@ -82,7 +80,7 @@ public class UDPClient {
 
                      ObjectInputStream ois = new ObjectInputStream(in);
                      tablero = (Tablero) ois.readObject();
-                     if(tablero.responseCode == 3){
+                     if(!tablero.turnoValido){
                          System.out.println("No es tu turno");
                      } else {
                          estadoPartida = tablero.estadoJuego();
@@ -99,24 +97,24 @@ public class UDPClient {
             } while (tablero.estadoJuego());
         }
 
-        public static void main(String[] args) {
-            String jugador, ipSrv;
+    public static void main(String[] args) {
+        String jugador, ipSrv;
 
-            //Demanem la ip del servidor i nom del jugador
-            System.out.println("IP del servidor?");
-            Scanner sc = new Scanner(System.in);
-            ipSrv = "192.168.22.104"; //sc.next();
-            System.out.println("Nom jugador:");
-            jugador = sc.next();
+        //Demanem la ip del servidor i nom del jugador
+        System.out.println("IP del servidor?");
+        Scanner sc = new Scanner(System.in);
+        ipSrv = "192.168.22.104"; //sc.next();
+        System.out.println("Nom jugador:");
+        jugador = sc.next();
 
-            UDPClient client = new UDPClient(ipSrv, 5556);
+        UDPClient client = new UDPClient(ipSrv, 5556);
 
-            client.setNom(jugador);
-            try {
-                client.runClient();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Victoria");
+        client.setNom(jugador);
+        try {
+            client.runClient();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        System.out.println("Victoria");
     }
+}

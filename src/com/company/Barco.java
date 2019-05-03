@@ -1,17 +1,14 @@
 package com.company;
 
 import java.io.Serializable;
-import java.util.Scanner;
 
 public class Barco implements Serializable {
 
     int numBarcosJ1 = 0;
     int numBarcosJ2 = 0;
-//    int tamano = 1;
     Tablero tablero1;
     Tablero tablero2;
     boolean derrota = true;
-    int estadoTablero = 0;
 
     void imprimeBarco(Tablero tableroJ1, Tablero tableroJ2) {
 
@@ -52,58 +49,29 @@ public class Barco implements Serializable {
 
     void disparar(Tablero tableroJ1, int x, int y){
 
-        tablero1 = tableroJ1;
+    tablero1 = tableroJ1;
 
-            if (x < 5 && x >= 1 || y < 5 && y >= 1) {
-                if(tableroJ1.tablero[x][y] == 'b') {
-                    tableroJ1.tablero[x][y] = 'x';
-                    numBarcosJ1--;
-                    tablero1.estadoPartida(derrota);
-                    System.out.println("Has hundido un barco.");
+        if (x < 5 && x >= 1 || y < 5 && y >= 1) {
+            if(tableroJ1.tablero[x][y] == 'b') {
+                tableroJ1.tablero[x][y] = 'x';
+                numBarcosJ1--;
+                tablero1.estadoPartida(derrota);
+                System.out.println("Has hundido un barco.");
 
-                    if (numBarcosJ1 == 0){
-                        derrota = false;
-                        System.out.println("Victoria!");
-                        tablero1.estadoPartida(derrota);
-                    }
-                }else{
-                    tablero1.actualizaTablero(x, y);
-                    System.out.println("Has fallado.");
+                if (numBarcosJ1 == 0){
+                    derrota = false;
+                    System.out.println("Victoria!");
                     tablero1.estadoPartida(derrota);
                 }
-            } else {
-                System.out.println("Valor incorrecto.");
+            }else{
+                tablero1.actualizaTablero(x, y);
+                System.out.println("Has fallado.");
+                tablero1.estadoPartida(derrota);
             }
-            System.out.println(numBarcosJ1);
-//        }
-
-//        tablero2 = tableroJ2;
-//
-//        while (numBarcosJ2 <= 3 && numBarcosJ2 > 0 && derrota) {
-//            System.out.println("Indica donde vas a disparar (x, y): ");
-//            int posX = sc.nextInt();
-//            int posY = sc.nextInt();
-//
-//
-//            if (posX < 5 && posX >= 1 || posY < 5 && posY >= 1) {
-//                if(tableroJ2.tablero[posX][posY] == 'b') {
-//                    tableroJ2.tablero[posX][posY] = 'x';
-//                    numBarcosJ2--;
-//                    System.out.println("Has hundido un barco.");
-//
-//                    if (numBarcosJ2 == 0){
-//                        derrota = false;
-//                        System.out.println("Victoria!");
-//                    }
-//                }else{
-//                    tablero2.actualizaTablero(posX, posY);
-//                    System.out.println("Has fallado.");
-//                }
-//            } else {
-//                System.out.println("Valor incorrecto.");
-//            }
-//        }
-
+        } else {
+            System.out.println("Valor incorrecto.");
+        }
+        System.out.println(numBarcosJ1);
     }
 }
 
